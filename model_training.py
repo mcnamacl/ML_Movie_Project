@@ -10,6 +10,9 @@ from sklearn.impute import SimpleImputer
 from sklearn.svm import LinearSVR
 from sklearn.linear_model import Lasso
 
+# Stops dividing by zero kNN error.
+np.seterr(divide='ignore', invalid='ignore')
+
 # Global variables that control what gamma is used in gaussian_kernel.
 gamma = [0, 1, 5, 10, 25]
 gIndex = 0
