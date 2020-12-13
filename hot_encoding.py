@@ -5,7 +5,7 @@ import ast
 from sklearn.feature_selection import f_regression
 import math, operator
 
-filename = "data.csv"
+filename = "original_data.csv"
 output_data_file = pd.read_csv(filename, sep="\t")
 
 
@@ -15,7 +15,7 @@ def read_dataset(columns):
         X = np.array(output_data_file.iloc[:, column])
         X = X.reshape(-1, 1)
         data.append(X)
-    output_data_file.drop(columns=output_data_file.columns[columns], axis=1, inplace=True)
+    # output_data_file.drop(columns=output_data_file.columns[columns], axis=1, inplace=True)
     output_data_file.to_csv(filename, index=False)
     return data
 
@@ -62,17 +62,25 @@ def hot_encode_arrays(data, target_column, check_importance):
         unique_values, orig_structure = get_values(rows)
         len_new_col = len(unique_values)
         new_cols = gen_array_hot_encode_rows(unique_values, orig_structure, len_new_col)
-        if not check_importance:
-            add_to_csv(new_cols, unique_values)
-        else:
-            new_cols = get_important_features(new_cols, target_column, unique_values)
+
+        if check_importance:
+            new_cols, unique_values = get_important_features(new_cols, target_column, unique_values)
+
+        add_to_csv(new_cols, unique_values)
 
 def get_important_features(new_cols, target_column, unique_values):
-    indexs = getTopFeatures(new_cols[0], target_column)
-    print(indexs)
+    indexs = getTopFeatures(new_cols, target_column)
+    important_columns = []
+    important_column_names = []
+    for i in range(0, len(indexs)):
+        important_columns.append(new_cols[i])
+        important_column_names.append(unique_values[i])
+    return important_columns, important_column_names
 
 # found here: https://www.programcreek.com/python/example/93975/sklearn.feature_selection.f_regression
 def getTopFeatures(train_x, train_y, n_features=20):
+    train_x = np.array(train_x)
+
     f_val, p_val = f_regression(train_x,train_y)
     f_val_dict = {}
     p_val_dict = {}
@@ -84,15 +92,14 @@ def getTopFeatures(train_x, train_y, n_features=20):
             p_val[i] = 0.0
         p_val_dict[i] = p_val[i]
     
-    sorted_f = sorted(f_val_dict.iteritems(), key=operator.itemgetter(1),reverse=True)
-    sorted_p = sorted(p_val_dict.iteritems(), key=operator.itemgetter(1),reverse=True)
+    sorted_f = sorted(f_val_dict.items(), key=operator.itemgetter(1),reverse=True)
+    sorted_p = sorted(p_val_dict.items(), key=operator.itemgetter(1),reverse=True)
     
     feature_indexs = []
     for i in range(0,n_features):
         feature_indexs.append(sorted_f[i][0])
     
     return feature_indexs
-
 
 def gen_single_vals_hot_encode_rows(unique_values, orig_stucture, len_new_col):
     result = []
@@ -113,13 +120,13 @@ def hot_encode_single_vals(data):
 
         add_to_csv(new_cols, unique_values)
 
-
 def add_to_csv(data, unique_values):
     data = [list(i) for i in zip(*data)]
 
     num_columns = len(unique_values)
     for column in range(num_columns):
         column_data = data[column]
+        print(len(data[column]))
         output_data_file[unique_values[column]] = column_data
         output_data_file.to_csv(filename, index=False)
 
@@ -136,11 +143,11 @@ if __name__ == "__main__":
     data_arrays_important_f.append(data[1])
     hot_encode_arrays(data_arrays_important_f, data[0], True)
 
-    # data_arrays = []
-    # data_arrays.append(data[2])
+    data_arrays = []
+    data_arrays.append(data[2])
 
-    # data_single_vals = []
-    # data_single_vals.append(data[3])
+    data_single_vals = []
+    data_single_vals.append(data[3])
 
-    # hot_encode_arrays(data_arrays, data[0], False)
-    # hot_encode_single_vals(data_single_vals)
+    hot_encode_arrays(data_arrays, data[0], False)
+    hot_encode_single_vals(data_single_vals)
