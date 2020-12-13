@@ -56,7 +56,7 @@ def return_month(date):
     return date.split("-")[1]
 
 def write_to_file(results):
-    with open("data.csv", "a+") as f:
+    with open("original_data.csv", "a+") as f:
         for x in zip(*results):
             f.write("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\n".format(*x))
 
