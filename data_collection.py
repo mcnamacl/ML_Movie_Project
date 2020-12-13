@@ -15,7 +15,7 @@ def add_json_ids(site, params):
     # totalPages = r["total_pages"]
     # should use totalPages but using 5 instead for now as 500 takes a while
     year_ids = []
-    for page in range(1, 50 + 1):
+    for page in range(1, 100 + 1):
         params["page"] = page
         r = return_results(site, params)
         for result in r["results"]:
