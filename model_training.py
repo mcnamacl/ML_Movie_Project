@@ -89,7 +89,8 @@ def crossValidationkNN(x, y):
     for g in gammaVals:
         tmpMeanErrors = []
         for train, test in kf.split(x):
-            model = KNeighborsRegressor(n_neighbors=len(x[train]), weights=gaussian_kernel).fit(x[train], y[train])
+            model = KNeighborsRegressor(n_neighbors=len(x[train]), weights=gaussian_kernel).fit(
+                x[train], y[train])
             
             ypred = model.predict(x[test])
 
@@ -139,7 +140,8 @@ def testLinearRegression(x, y):
     preds = model.predict(X_test)
     splitError = mean_squared_error(y_test,preds)
 
-    print("LG k-fold mean squared error: %f, baseline square error: %f, LG not-folded error: %f, LG 80:20 error: %f"%(kFoldError, dummyError, lgError, splitError))
+    print("LG k-fold mean squared error: %f, baseline square error: %f, LG not-folded error: %f, LG 80:20 error: %f"
+    %(kFoldError, dummyError, lgError, splitError))
 
 # Cross validation for various values of gamma using a Linear Regression model.
 def kFoldLinearRegression(x, y):
