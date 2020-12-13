@@ -10,11 +10,11 @@ from sklearn.impute import SimpleImputer
 from sklearn.svm import LinearSVR
 from sklearn.linear_model import Lasso
 
-# Global variables that control what gamma is used in gaussian_kernal.
+# Global variables that control what gamma is used in gaussian_kernel.
 gamma = [0, 1, 5, 10, 25]
 gIndex = 0
 
-# Gaussian kernel to weight neighbours based on their distance from the input feature
+# Gaussian kernel to weight neighbours based on their distance from the input feature.
 def gaussian_kernel(distances):
     g = gamma[gIndex]
     weights = np.exp(-g*(distances**2))
@@ -23,8 +23,6 @@ def gaussian_kernel(distances):
 # Train a Lasso Regression Model with varying values of C.
 def trainWithCombinationsLasso(x, y):
     cValues = [1, 10, 100, 1000, 10000]
-    figNum = 1
-    predictions = []
     means = []
     print("Lasso Parameters:")
 
@@ -46,7 +44,7 @@ def trainWithCombinationsLasso(x, y):
         print("Mean Lasso " + str(c))
         print(mean_squared_error(y_test, newPredictions))
 
-    # Plot the mean and standard deviation of various C valies.
+    # Plot the mean and standard deviation of various C values.
     plotMeanAndStdDev(np.array(cValues), "C", means, [0,0,0,0,0], "Lasso Cross Validation C")  
 
 # Cross validation for various values of C using a KernelRidge model.
@@ -110,7 +108,7 @@ def crossValidationkNN(x, y):
         devs.append(np.std(tmpMeanErrors))
         gIndex = gIndex + 1
     print("Cross validation gamma: ", means)
-    # Plot the mean and standard deviation of various C valies.
+    # Plot the mean and standard deviation of various C values.
     plotMeanAndStdDev(np.array(gammaVals), "Gamma", means, devs, "kNN Cross Validation Gamma")  
 
 # General function for plotting the mean and standard deviation.
@@ -120,15 +118,31 @@ def plotMeanAndStdDev(xplot, xlabel, means, devs, title):
     plt.xlabel(xlabel); plt.ylabel('Mean square error')
     plt.show()
 
-def linear_regression(X, y):
-    model = LinearRegression()
-    model.fit(X, y)
-    print("sklearn model theta values: theta_0 = {}, theta_1 = {}"
-    .format(model.intercept_, model.coef_))
-    return model
+# Testing linear regression mean squared errors.
+def testLinearRegression(x, y):
+    # Mean for Linear Regression model using all of the data for training.
+    model = LinearRegression().fit(x, y)
+    ypred = model.predict(x)  
+    lgError = mean_squared_error(y,ypred)
 
-# Cross validation for various values of gamma using a kNN model.
-def crossValidationLG(x, y):
+    # Average mean when using k-folds for training and testing.
+    kFoldError = kFoldLinearRegression(x,y)
+
+    # Mean when using dummy model with all of the data used for training.
+    dummy = DummyRegressor(strategy="mean").fit(X=x, y=y)
+    dummy_preds = dummy.predict(x)
+    dummyError = mean_squared_error(y,dummy_preds)
+
+    # Mean when using an 80:20 train:test split for Linear Regression.
+    X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
+    model = LinearRegression().fit(X_train, y_train)
+    preds = model.predict(X_test)
+    splitError = mean_squared_error(y_test,preds)
+
+    print("LG k-fold mean squared error: %f, baseline square error: %f, LG not-folded error: %f, LG 80:20 error: %f"%(kFoldError, dummyError, lgError, splitError))
+
+# Cross validation for various values of gamma using a Linear Regression model.
+def kFoldLinearRegression(x, y):
     kf = KFold(n_splits=5)
     meanErrors = []
     for train, test in kf.split(x):
@@ -140,22 +154,9 @@ def crossValidationLG(x, y):
         # Store the mean squared error.
         meanErrors.append(predError)
 
-    model = LinearRegression().fit(x, y)
-    ypred = model.predict(x)  
-    predError = mean_squared_error(y,ypred)
-    print(meanErrors)
-    meanLG = np.mean(meanErrors)
-    dummy = DummyRegressor(strategy="mean").fit(X=x, y=y)
-    dummy_preds = dummy.predict(x)
+    return np.mean(meanErrors)
 
-    X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
-    model = LinearRegression().fit(X_train, y_train)
-    preds = model.predict(X_test)
-    p_error = mean_squared_error(y_test,preds)
-
-    print("LG mean squared error: %f, baseline square error: %f, LG not folded error: %f, LG 80:20: %f"%(meanLG,mean_squared_error(y,dummy_preds), predError, p_error))
-
-
+# Normalising input data, used for arrays that contain very large values.
 def normalise_data(input_array):
     # This function normalises an array's values using the formula: 
     # new_value = (curr_value - min_value) / (max_value - min_value)
@@ -167,6 +168,8 @@ def normalise_data(input_array):
     output_array = np.array(output_array)   
     return output_array
 
+# Reads in dataset and creates y, the output, and X, an array of arrays
+# where each array is a feature column. 
 def read_dataset():
     df = pd.read_csv("data.csv")
     X = []
@@ -187,7 +190,7 @@ if __name__ == "__main__":
 
     X_joined = np.column_stack((X))
 
-    crossValidationLG(X_joined, y)
+    testLinearRegression(X_joined, y)
 
     crossValidationkNN(X_joined, y)
 
