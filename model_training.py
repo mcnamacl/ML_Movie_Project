@@ -17,11 +17,12 @@ np.seterr(divide='ignore', invalid='ignore')
 gamma = [0, 1, 5, 10, 25]
 gIndex = 0
 
-# Gaussian kernel to weight neighbours based on their distance from the input feature.
-def gaussian_kernel(distances):
-    g = gamma[gIndex]
-    weights = np.exp(-g*(distances**2))
-    return weights/np.sum(weights)
+# General function for plotting the mean and standard deviation.
+def plotMeanAndStdDev(xplot, xlabel, means, devs, title):
+    plt.errorbar(xplot,means,yerr=devs)
+    plt.title(title)
+    plt.xlabel(xlabel); plt.ylabel('Mean square error')
+    plt.show()
 
 # Train a Lasso Regression Model with varying values of C.
 def trainWithCombinationsLasso(x, y):
@@ -80,6 +81,12 @@ def crossValidationLinearSVR(x, y):
     # Plot the mean and standard deviation of various C valies.
     plotMeanAndStdDev(np.array(C), "C", means, devs, "LinearSVR Cross Validation C")  
 
+# Gaussian kernel to weight neighbours based on their distance from the input feature.
+def gaussian_kernel(distances):
+    g = gamma[gIndex]
+    weights = np.exp(-g*(distances**2))
+    return weights/np.sum(weights)
+
 # Cross validation for various values of gamma using a kNN model.
 def crossValidationkNN(x, y):
     means = []
@@ -114,13 +121,6 @@ def crossValidationkNN(x, y):
     print("Cross validation gamma: ", means)
     # Plot the mean and standard deviation of various C values.
     plotMeanAndStdDev(np.array(gammaVals), "Gamma", means, devs, "kNN Cross Validation Gamma")  
-
-# General function for plotting the mean and standard deviation.
-def plotMeanAndStdDev(xplot, xlabel, means, devs, title):
-    plt.errorbar(xplot,means,yerr=devs)
-    plt.title(title)
-    plt.xlabel(xlabel); plt.ylabel('Mean square error')
-    plt.show()
 
 # Testing linear regression mean squared errors.
 def testLinearRegression(x, y):
@@ -162,7 +162,7 @@ def kFoldLinearRegression(x, y):
     return np.mean(meanErrors)
 
 # Normalising input data, used for arrays that contain very large values.
-def normalise_data(input_array):
+def normaliseData(input_array):
     # This function normalises an array's values using the formula: 
     # new_value = (curr_value - min_value) / (max_value - min_value)
     min_value = min(input_array)
@@ -175,20 +175,20 @@ def normalise_data(input_array):
 
 # Reads in dataset and creates y, the output, and X, an array of arrays
 # where each array is a feature column. 
-def read_dataset():
+def readDataset():
     df = pd.read_csv("data.csv")
     X = []
     y = np.array(df.iloc[:,0])
-    y = normalise_data(y)
+    y = normaliseData(y)
     for column in range(1,len(df.columns)):
         data = np.array(df.iloc[:,column])
         if column == 1:
-            data = normalise_data(data)
+            data = normaliseData(data)
         X.append(data)
     return X, y
 
 if __name__ == "__main__":
-    X, y = read_dataset()
+    X, y = readDataset()
 
     imp = SimpleImputer(missing_values=np.nan, strategy='mean')
     imp.fit_transform(X)
