@@ -115,7 +115,7 @@ def get_important_features(encoded_rows, output, unique_values):
 
 
 # found here: https://www.programcreek.com/python/example/93975/sklearn.feature_selection.f_regression
-def getTopFeatures(train_x, train_y, n_features=20):
+def getTopFeatures(train_x, train_y, n_features=10):
     train_x = np.array(train_x)
     train_y = ravel(train_y)
     f_val, p_val = f_regression(train_x, train_y)

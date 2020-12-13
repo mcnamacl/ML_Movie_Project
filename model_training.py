@@ -176,7 +176,7 @@ def normaliseData(input_array):
 # Reads in dataset and creates y, the output, and X, an array of arrays
 # where each array is a feature column. 
 def readDataset():
-    df = pd.read_csv("data.csv")
+    df = pd.read_csv("original_data.csv")
     X = []
     y = np.array(df.iloc[:,0])
     y = normaliseData(y)
