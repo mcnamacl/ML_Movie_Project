@@ -1,11 +1,6 @@
 import pandas as pd
 import numpy as np
 import ast
-from sklearn.feature_selection import f_regression
-from sklearn.feature_selection import SelectKBest
-
-filename = "current1.csv"
-output_data_file = pd.read_csv(filename, sep="\t", header=None)
 
 # Reads in the columns which we want to one-hot-encode.
 def read_dataset(columns):
@@ -21,12 +16,6 @@ def read_dataset(columns):
                           inplace=True)
     output_data_file.to_csv(filename, index=False)
     return data
-
-# Reads in the revenue from the data file, which is our output y.
-def read_output():
-    y = np.array(output_data_file.iloc[:, 0])
-    y = y.reshape(-1, 1)
-    return y
 
 # This function gets all of the unique values for a given column,
 # as well as the specific values contained in each row of the columns.
@@ -70,8 +59,40 @@ def hot_encode_row(unique_values, row, len_new_col):
             hot_encode[i] = 1
     return hot_encode
 
+
+def test_file_function(encoded_rows, unique_values, feature_filename):
+    feature_file = pd.read_csv(feature_filename, sep="\t", header=None)
+    # Gets the array of important features.
+    data = np.array(feature_file.iloc[:, 0])
+    data = data.reshape(-1, 1)
+
+    indexes = {}
+    for i in range(0, len(data)):    
+        indexes[data[i][0]] = -1
+
+    index = 0
+    for val in unique_values:
+        if val in indexes:
+            indexes[val] = index
+        index = index + 1        
+
+    important_columns = []
+    important_column_names = []
+    # Transposing rows in order to separate out the values for each new feature.
+    encoded_rows = [list(i) for i in zip(*encoded_rows)]
+    for val in indexes:
+        if indexes[val] != -1:
+            important_columns.append(encoded_rows[indexes[val]])
+        else:
+            important_columns.append(np.zeros(len(encoded_rows[0])))
+        important_column_names.append(val)
+
+    # Transposing the data into its original form.
+    important_columns = [list(i) for i in zip(*important_columns)]
+    return important_columns, important_column_names
+
 # This function hot encodes columns which can contain arrays of values, i.e. multiple values.
-def hot_encode_multivals(columns, output, check_importance, feature_filename):
+def hot_encode_multivals(columns, feature_filename):
     for column in columns:
         unique_values, orig_structure = get_values(column)
 
@@ -83,40 +104,9 @@ def hot_encode_multivals(columns, output, check_importance, feature_filename):
                                                   orig_structure, num_new_cols)
 
         # If we are limiting the number of new columns to only the most important ones.
-        if check_importance:
-            encoded_rows, unique_values = get_important_features(
-                    encoded_rows, output, unique_values)
+        encoded_rows, unique_values = test_file_function(encoded_rows, unique_values, feature_filename)
 
-        write_to_file(unique_values, feature_filename)
         add_to_csv(encoded_rows, unique_values)
-
-def write_to_file(results, feature_filename):
-    with open(feature_filename, "a+") as f:
-        for result in results:
-            f.write(result)
-            f.write('\n')
-
-# Gets the most influential values in a columns, aka the most important features.
-def get_important_features(encoded_rows, output, unique_values):
-    getTopFeatures(encoded_rows, output)
-    indexes = getTopFeatures(encoded_rows, output)
-    important_columns = []
-    important_column_names = []
-
-    # Transposing rows in order to separate out the values for each new feature.
-    encoded_rows = [list(i) for i in zip(*encoded_rows)]
-    for i in range(0, len(indexes)):
-        important_columns.append(encoded_rows[i])
-        important_column_names.append(unique_values[i])
-
-    # Transposing the data into its original form.
-    important_columns = [list(i) for i in zip(*important_columns)]
-    return important_columns, important_column_names
-
-def getTopFeatures(train_x, train_y):
-    x_new = SelectKBest(f_regression, k=10).fit(train_x, train_y)
-    cols = x_new.get_support(indices=True)
-    return cols
 
 def hot_encode_single_val_column(unique_values, orig_stucture, len_new_col):
     result = []
@@ -131,7 +121,7 @@ def hot_encode_single_vals(columns, feature_filename):
         num_new_cols = len(unique_values)
         encoded_rows = hot_encode_single_val_column(unique_values, orig_structure,
                                                 num_new_cols)
-        write_to_file(unique_values, feature_filename)
+        encoded_rows, unique_values = test_file_function(encoded_rows, unique_values, feature_filename)
         add_to_csv(encoded_rows, unique_values)
 
 def add_to_csv(data, unique_values):
@@ -143,7 +133,9 @@ def add_to_csv(data, unique_values):
         output_data_file.to_csv(filename, index=False)
 
 if __name__ == "__main__":
-    output = read_output()
+    filename="original_data_2018.csv"
+    output_data_file = pd.read_csv(filename, sep="\t", header=None)
+
     data_columns = [3, 4, 5]
     columns = read_dataset(data_columns)
 
@@ -152,6 +144,6 @@ if __name__ == "__main__":
     data_single_vals = [columns[2]]
 
     feature_filenames = ["important_companies.csv", "genres.csv", "langs.csv"]
-    hot_encode_multivals(data_arrays_important_f, output, True, feature_filenames[0])
-    hot_encode_multivals(data_arrays, output, False, feature_filenames[1])
+    hot_encode_multivals(data_arrays_important_f, feature_filenames[0])
+    hot_encode_multivals(data_arrays, feature_filenames[1])
     hot_encode_single_vals(data_single_vals, feature_filenames[2])

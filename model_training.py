@@ -17,6 +17,12 @@ np.seterr(divide='ignore', invalid='ignore')
 gamma = [0, 1, 5, 10, 25]
 gIndex = 0
 
+# Gaussian kernel to weight neighbours based on their distance from the input feature.
+def gaussian_kernel(distances):
+    g = gamma[gIndex]
+    weights = np.exp(-g*(distances**2))
+    return weights/np.sum(weights)
+
 # General function for plotting the mean and standard deviation.
 def plotMeanAndStdDev(xplot, xlabel, means, devs, title):
     plt.errorbar(xplot,means,yerr=devs)
@@ -80,12 +86,6 @@ def crossValidationLinearSVR(x, y):
     print("Cross validation c: ", means)
     # Plot the mean and standard deviation of various C valies.
     plotMeanAndStdDev(np.array(C), "C", means, devs, "LinearSVR Cross Validation C")  
-
-# Gaussian kernel to weight neighbours based on their distance from the input feature.
-def gaussian_kernel(distances):
-    g = gamma[gIndex]
-    weights = np.exp(-g*(distances**2))
-    return weights/np.sum(weights)
 
 # Cross validation for various values of gamma using a kNN model.
 def crossValidationkNN(x, y):
@@ -161,6 +161,28 @@ def kFoldLinearRegression(x, y):
 
     return np.mean(meanErrors)
 
+def testEachModel(X, y, X_test, y_test):
+    lasso_model = Lasso(alpha=(1/(2*1000))).fit(X, y)
+    lasso_preds = lasso_model.predict(X_test)
+    lasso_predError = mean_squared_error(lasso_preds, y_test)
+    print("Lasso mean squared error: ", lasso_predError)
+
+    linearSVR_model = LinearSVR(C=10).fit(X, y)
+    linearSVR_preds = linearSVR_model.predict(X_test)
+    linearSVR_predError = mean_squared_error(linearSVR_preds, y_test)
+    print("linearSVR mean squared error: ", linearSVR_predError)
+
+    gIndex = 1
+    kNN_model = KNeighborsRegressor(n_neighbors=len(X), weights=gaussian_kernel).fit(X, y)
+    kNN_preds = kNN_model.predict(X_test)
+    kNN_predError = mean_squared_error(kNN_preds, y_test)
+    print("kNN mean squared error: ", kNN_predError)
+
+    lg_model = LinearRegression().fit(X, y)
+    lg_preds = lg_model.predict(X_test)
+    lg_predError = mean_squared_error(lg_preds, y_test)
+    print("Linear Regression mean squared error: ", lg_predError)
+
 # Normalising input data, used for arrays that contain very large values.
 def normaliseData(input_array):
     # This function normalises an array's values using the formula: 
@@ -175,8 +197,8 @@ def normaliseData(input_array):
 
 # Reads in dataset and creates y, the output, and X, an array of arrays
 # where each array is a feature column. 
-def readDataset():
-    df = pd.read_csv("original_data.csv")
+def readDataset(filename):
+    df = pd.read_csv(filename)
     X = []
     y = np.array(df.iloc[:,0])
     y = normaliseData(y)
@@ -188,17 +210,28 @@ def readDataset():
     return X, y
 
 if __name__ == "__main__":
-    X, y = readDataset()
+    X, y = readDataset("current1.csv")
 
     imp = SimpleImputer(missing_values=np.nan, strategy='mean')
     imp.fit_transform(X)
 
-    X_joined = np.column_stack((X))
+    X = np.column_stack((X))
 
-    testLinearRegression(X_joined, y)
+    # testLinearRegression(X, y)
 
-    crossValidationkNN(X_joined, y)
+    # crossValidationkNN(X, y)
 
-    crossValidationLinearSVR(X_joined, y)
+    # crossValidationLinearSVR(X, y)
 
-    trainWithCombinationsLasso(X_joined, y)
+    # trainWithCombinationsLasso(X, y)
+
+    X_test, y_test = readDataset("original_data_2018.csv")
+
+    print(X_test, y_test)
+
+    imp = SimpleImputer(missing_values=np.nan, strategy='mean')
+    imp.fit_transform(X_test)
+
+    X_test = np.column_stack((X_test))
+
+    testEachModel(X, y, X_test, y_test)
