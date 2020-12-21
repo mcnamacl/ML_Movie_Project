@@ -13,7 +13,7 @@ from sklearn.linear_model import Lasso
 np.seterr(divide='ignore', invalid='ignore')
 
 # Global variables that control what gamma is used in gaussian_kernel.
-gamma = [0, 1, 5, 10, 25]
+gamma = [0, 1, 2, 5, 10, 15]
 gIndex = 0
 
 # Gaussian kernel to weight neighbours based on their distance from the input feature.
@@ -61,7 +61,7 @@ def trainWithCombinationsLasso(x, y):
 def crossValidationkNN(x, y):
     means = []
     devs = []
-    gammaVals = [0, 1, 5, 10, 25]
+    gammaVals = [0, 1, 2, 5, 10, 15]
     # Use 5 folds.
     kf = KFold(n_splits=5)
     global gIndex
