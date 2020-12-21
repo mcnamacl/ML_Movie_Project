@@ -133,7 +133,7 @@ def add_to_csv(data, unique_values):
         output_data_file.to_csv(filename, index=False)
 
 if __name__ == "__main__":
-    filename="imdb_omdb_original_test.csv"
+    filename="CSV_files/test_pre_processing.csv"
     output_data_file = pd.read_csv(filename, sep="\t", header=None)
 
     data_columns = [3, 4, 5]
@@ -143,7 +143,7 @@ if __name__ == "__main__":
     data_arrays = [columns[1]]
     data_single_vals = [columns[2]]
 
-    feature_filenames = ["important_companies.csv", "genres.csv", "langs.csv"]
+    feature_filenames = ["CSV_files/important_companies.csv", "CSV_files/genres.csv", "CSV_files/langs.csv"]
     hot_encode_multivals(data_arrays_important_f, feature_filenames[0])
     hot_encode_multivals(data_arrays, feature_filenames[1])
     hot_encode_single_vals(data_single_vals, feature_filenames[2])

@@ -186,7 +186,7 @@ def readDataset(filename):
     return X, y
 
 if __name__ == "__main__":
-    X, y = readDataset("final_training.csv")
+    X, y = readDataset("CSV_files/final_training.csv")
 
     imp = SimpleImputer(missing_values=np.nan, strategy='mean')
     imp.fit_transform(X)
@@ -199,7 +199,7 @@ if __name__ == "__main__":
 
     trainWithCombinationsLasso(X_joined, y)
 
-    X_test, y_test = readDataset("final_testing.csv")
+    X_test, y_test = readDataset("CSV_files/final_testing.csv")
 
     imp = SimpleImputer(missing_values=np.nan, strategy='mean')
     imp.fit_transform(X_test)
