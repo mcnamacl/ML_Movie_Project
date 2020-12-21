@@ -178,13 +178,13 @@ def readDataset(filename):
     y = normaliseData(y)
     for column in range(1,len(df.columns)):
         data = np.array(df.iloc[:,column])
-        if column == 1 or column == 5:
+        if column == 1 or column == 3:
             data = normaliseData(data)
         X.append(data)
     return X, y
 
 if __name__ == "__main__":
-    X, y = readDataset("imdb_omdb_original.csv")
+    X, y = readDataset("final_training.csv")
 
     imp = SimpleImputer(missing_values=np.nan, strategy='mean')
     imp.fit_transform(X)
@@ -197,7 +197,7 @@ if __name__ == "__main__":
 
     trainWithCombinationsLasso(X_joined, y)
 
-    X_test, y_test = readDataset("imdb_omdb_original_test.csv")
+    X_test, y_test = readDataset("final_testing.csv")
 
     imp = SimpleImputer(missing_values=np.nan, strategy='mean')
     imp.fit_transform(X_test)
