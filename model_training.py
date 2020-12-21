@@ -167,7 +167,7 @@ def testEachModel(X, y, X_test, y_test):
     lasso_predError = mean_squared_error(lasso_preds, y_test)
     print("Lasso mean squared error: ", lasso_predError)
 
-    linearSVR_model = LinearSVR(C=10).fit(X, y)
+    linearSVR_model = LinearSVR(C=10, max_iter=10000).fit(X, y)
     linearSVR_preds = linearSVR_model.predict(X_test)
     linearSVR_predError = mean_squared_error(linearSVR_preds, y_test)
     print("linearSVR mean squared error: ", linearSVR_predError)
@@ -232,4 +232,4 @@ if __name__ == "__main__":
 
     X_test_joined = np.column_stack((X_test))
 
-    testEachModel(X_test_joined, y, X_test, y_test)
+    testEachModel(X_joined, y, X_test_joined, y_test)
