@@ -151,6 +151,12 @@ def testEachModel(X, y, X_test, y_test):
     lg_predError = mean_squared_error(lg_preds, y_test)
     print("Linear Regression mean squared error: ", lg_predError)
 
+    # Mean when using dummy model with all of the data used for training.
+    dummy = DummyRegressor(strategy="mean").fit(X=X, y=y)
+    dummy_preds = dummy.predict(X_test)
+    dummyError = mean_squared_error(y_test,dummy_preds)
+    print("Dummy Regressor mean squared error: ", dummyError)
+
 # Normalising input data, used for arrays that contain very large values.
 def normaliseData(input_array):
     # This function normalises an array's values using the formula: 
@@ -172,13 +178,13 @@ def readDataset(filename):
     y = normaliseData(y)
     for column in range(1,len(df.columns)):
         data = np.array(df.iloc[:,column])
-        if column == 1:
+        if column == 1 or column == 5:
             data = normaliseData(data)
         X.append(data)
     return X, y
 
 if __name__ == "__main__":
-    X, y = readDataset("current1.csv")
+    X, y = readDataset("imdb_omdb_original.csv")
 
     imp = SimpleImputer(missing_values=np.nan, strategy='mean')
     imp.fit_transform(X)
@@ -191,7 +197,7 @@ if __name__ == "__main__":
 
     trainWithCombinationsLasso(X_joined, y)
 
-    X_test, y_test = readDataset("original_data_2018.csv")
+    X_test, y_test = readDataset("imdb_omdb_original_test.csv")
 
     imp = SimpleImputer(missing_values=np.nan, strategy='mean')
     imp.fit_transform(X_test)
