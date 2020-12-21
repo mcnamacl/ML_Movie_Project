@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import math
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import KFold, train_test_split
@@ -69,9 +70,7 @@ def crossValidationkNN(x, y):
     for g in gammaVals:
         tmpMeanErrors = []
         for train, test in kf.split(x):
-            model = KNeighborsRegressor(n_neighbors=len(x[train]), weights=gaussian_kernel).fit(
-                x[train], y[train])
-            
+            model = KNeighborsRegressor(n_neighbors=int(math.sqrt(len(x[train]))), weights=gaussian_kernel).fit(x[train], y[train])
             ypred = model.predict(x[test])
 
             mask = np.isnan(ypred)
