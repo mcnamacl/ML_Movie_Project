@@ -135,6 +135,7 @@ def testEachModel(X, y, X_test, y_test):
     lasso_model = Lasso(alpha=(1/(2*1000))).fit(X, y)
     lasso_preds = lasso_model.predict(X_test)
     lasso_predError = mean_squared_error(lasso_preds, y_test)
+    print(lasso_model.coef_)
     print("Lasso mean squared error: ", lasso_predError)
 
     global gIndex
@@ -149,6 +150,7 @@ def testEachModel(X, y, X_test, y_test):
     lg_model = LinearRegression().fit(X, y)
     lg_preds = lg_model.predict(X_test)
     lg_predError = mean_squared_error(lg_preds, y_test)
+    print(lg_model.coef_)
     print("Linear Regression mean squared error: ", lg_predError)
 
     # Mean when using dummy model with all of the data used for training.
