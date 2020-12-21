@@ -215,23 +215,21 @@ if __name__ == "__main__":
     imp = SimpleImputer(missing_values=np.nan, strategy='mean')
     imp.fit_transform(X)
 
-    X = np.column_stack((X))
+    X_joined = np.column_stack((X))
 
-    # testLinearRegression(X, y)
+    # testLinearRegression(X_joined, y)
 
-    # crossValidationkNN(X, y)
+    # crossValidationkNN(X_joined, y)
 
-    # crossValidationLinearSVR(X, y)
+    # crossValidationLinearSVR(X_joined, y)
 
-    # trainWithCombinationsLasso(X, y)
+    # trainWithCombinationsLasso(X_joined, y)
 
     X_test, y_test = readDataset("original_data_2018.csv")
-
-    print(X_test, y_test)
 
     imp = SimpleImputer(missing_values=np.nan, strategy='mean')
     imp.fit_transform(X_test)
 
-    X_test = np.column_stack((X_test))
+    X_test_joined = np.column_stack((X_test))
 
-    testEachModel(X, y, X_test, y_test)
+    testEachModel(X_test_joined, y, X_test, y_test)
