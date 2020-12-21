@@ -133,7 +133,7 @@ def add_to_csv(data, unique_values):
         output_data_file.to_csv(filename, index=False)
 
 if __name__ == "__main__":
-    filename="original_data_2018.csv"
+    filename="imdb_omdb_original_test.csv"
     output_data_file = pd.read_csv(filename, sep="\t", header=None)
 
     data_columns = [3, 4, 5]

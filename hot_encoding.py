@@ -4,7 +4,7 @@ import ast
 from sklearn.feature_selection import f_regression
 from sklearn.feature_selection import SelectKBest
 
-filename = "current1.csv"
+filename = "imdb_omdb_original.csv"
 output_data_file = pd.read_csv(filename, sep="\t", header=None)
 
 # Reads in the columns which we want to one-hot-encode.

@@ -69,14 +69,15 @@ def return_month(date):
     return date.split("-")[1]
 
 def write_to_file(results):
-    with open("imdb_omdb_original.csv", "a+") as f:
+    with open("imdb_omdb_original_test.csv", "a+") as f:
         for x in zip(*results):
             f.write("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\n".format(*x))
 
 if __name__ == "__main__":
     # Getting movie IDs.
     site = "http://api.themoviedb.org/3/discover/movie"
-    years = [2015, 2016, 2017]
+    #years = [2015, 2016, 2017]
+    years = [2018]
     features = ["id"]
     for year in years:
         params = {
