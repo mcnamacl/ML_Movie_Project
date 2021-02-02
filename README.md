@@ -1,4 +1,4 @@
-# ML_Movie_Project
+# Predicting Movie Revenue (Machine Learning Project)
 
 A machine learning project using movie data to predict box office revenue completed as part of a university module. 
 
